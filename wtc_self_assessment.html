@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Willingness to Communicate Self-Assessment</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #5f6b7a;
+      --line: #d9dee7;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --low: #f97316;
+      --avg: #facc15;
+      --high: #22c55e;
+      --danger: #b91c1c;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      padding: 2.5rem 1rem;
+    }
+
+    .wrap {
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.9rem, 3vw, 3rem);
+      line-height: 1.1;
+    }
+
+    header p {
+      max-width: 800px;
+      margin: 0;
+      font-size: 1.05rem;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: -1.5rem auto 3rem;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 1.4rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .directions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .privacy {
+      background: #eff6ff;
+      border-left: 5px solid var(--blue);
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      color: #1e3a8a;
+    }
+
+    .progress-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-radius: 0 0 18px 18px;
+      margin-bottom: 1rem;
+    }
+
+    .progress-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+      font-weight: 700;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, var(--blue));
+      transition: width 0.2s ease;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 380px) 72px;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item:last-child { border-bottom: none; }
+
+    .item-label {
+      font-weight: 650;
+    }
+
+    .item-label span {
+      color: var(--muted);
+      margin-right: 0.4rem;
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .valueBox {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.25rem;
+    }
+
+    .percentValue {
+      width: 54px;
+      padding: 0.4rem 0.35rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+      text-align: right;
+      font-size: 0.95rem;
+    }
+
+    .unanswered .percentValue {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.8rem 1.15rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .primary:hover { background: var(--blue-dark); }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary:hover { background: #d1d5db; }
+
+    .error {
+      color: var(--danger);
+      font-weight: 700;
+      display: none;
+      margin-top: 0.8rem;
+    }
+
+    #results { display: none; }
+
+    .overall {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .overall h2 { margin: 0; }
+
+    .overallScore {
+      text-align: right;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      margin-left: 0.4rem;
+    }
+
+    .badge.low { background: #ffedd5; color: #9a3412; }
+    .badge.average { background: #fef9c3; color: #854d0e; }
+    .badge.high { background: #dcfce7; color: #166534; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.85rem 0.65rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+
+    .scoreCell {
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .barGroup {
+      min-width: 240px;
+    }
+
+    .scaleBar {
+      position: relative;
+      height: 20px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: linear-gradient(90deg,
+        var(--low) 0%,
+        var(--low) var(--lowStop),
+        var(--avg) var(--lowStop),
+        var(--avg) var(--highStop),
+        var(--high) var(--highStop),
+        var(--high) 100%);
+      border: 1px solid rgba(15, 23, 42, 0.15);
+    }
+
+    .marker {
+      position: absolute;
+      top: -4px;
+      left: calc(var(--score) * 1%);
+      transform: translateX(-50%);
+      width: 4px;
+      height: 28px;
+      background: #111827;
+      border-radius: 999px;
+      box-shadow: 0 0 0 2px white;
+    }
+
+    .barLabels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 0.3rem;
+    }
+
+    .interpretation {
+      color: #374151;
+      max-width: 370px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      margin-right: 0.35rem;
+      vertical-align: -1px;
+    }
+
+    .legend .l::before { background: var(--low); }
+    .legend .a::before { background: var(--avg); }
+    .legend .h::before { background: var(--high); }
+
+    .printNote {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    footer {
+      max-width: 1050px;
+      margin: 0 auto 2rem;
+      padding: 0 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .item {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+
+      .valueBox { justify-content: flex-start; }
+
+      .overall {
+        grid-template-columns: 1fr;
+      }
+
+      .overallScore { text-align: left; }
+
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-bottom: 0.8rem;
+        overflow: hidden;
+      }
+      td {
+        border-bottom: none;
+        padding: 0.7rem 0.75rem;
+      }
+      td::before {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.1rem;
+      }
+      td[data-label]::before { content: attr(data-label); }
+      .barGroup { min-width: unset; }
+    }
+
+    @media print {
+      header, .progress-wrap, #assessmentCard, .actions, footer { display: none !important; }
+      main { margin: 0; max-width: none; }
+      .card { box-shadow: none; border: none; }
+      #results { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Willingness to Communicate Self-Assessment</h1>
+      <p>Indicate what percentage of the time you would choose to communicate in each situation, assuming you have complete free choice.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card directions">
+      <div>
+        <strong>Directions:</strong> Move each slider or type a number from <strong>0%</strong> meaning <em>never communicating</em> to <strong>100%</strong> meaning <em>always communicating</em>.
+      </div>
+      <div class="privacy">
+        <strong>Privacy note:</strong> This page does not collect, transmit, or store your answers. All scoring happens in your browser.
+      </div>
+    </section>
+
+    <section class="card progress-wrap" aria-live="polite">
+      <div class="progress-line">
+        <span id="progressText">0 out of 20 completed</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </section>
+
+    <section class="card" id="assessmentCard">
+      <form id="wtcForm">
+        <div id="items"></div>
+        <div class="actions">
+          <button type="submit" class="primary">Calculate my WTC scores</button>
+          <button type="button" class="secondary" id="resetBtn">Reset</button>
+        </div>
+        <div class="error" id="errorMsg">Please answer all 20 items before calculating your scores.</div>
+      </form>
+    </section>
+
+    <section class="card" id="results" aria-live="polite">
+      <div class="overall">
+        <div>
+          <h2>Your Overall WTC</h2>
+          <p id="overallInterpretation"></p>
+        </div>
+        <div>
+          <div class="overallScore" id="overallScore"></div>
+          <div id="overallBadge"></div>
+        </div>
+      </div>
+
+      <h2>Scores and Norm Comparisons</h2>
+      <p class="printNote">Scores are reported on a 0 to 100 scale. In the bars below, orange indicates the low range, yellow indicates the average range, and green indicates the high range.</p>
+      <div class="legend" aria-hidden="true">
+        <span class="l">Low</span>
+        <span class="a">Average</span>
+        <span class="h">High</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Scale</th>
+            <th>Score</th>
+            <th>Interpretation</th>
+            <th>Norm Comparison</th>
+          </tr>
+        </thead>
+        <tbody id="scoreRows"></tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" class="secondary" onclick="window.print()">Print or save results</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>This teaching tool is a browser-based scoring aid for the Willingness to Communicate self-assessment. It is intended for classroom reflection and discussion, not clinical diagnosis.</p>
+  </footer>
+
+  <script>
+    const items = [
+      "Talk with a customer service employee at a gas station.",
+      "Talk with a healthcare provider.",
+      "Present a talk to a group of strangers.",
+      "Talk with an acquaintance while standing in line.",
+      "Talk with a salesperson in a store.",
+      "Talk in a large meeting of friends.",
+      "Talk with a police officer.",
+      "Talk in a small group of strangers.",
+      "Talk with a friend while standing in line.",
+      "Talk with a restaurant server.",
+      "Talk in a large meeting of acquaintances.",
+      "Talk with a stranger while standing in line.",
+      "Talk with an administrative assistant.",
+      "Present a talk to a group of friends.",
+      "Talk in a small group of acquaintances.",
+      "Talk with a sanitation worker.",
+      "Talk in a large meeting of strangers.",
+      "Talk with a romantic partner.",
+      "Talk in a small group of friends.",
+      "Present a talk to a group of acquaintances."
+    ];
+
+    const scoring = [
+      { key: "group", name: "Group Discussion", items: [8, 15, 19], low: 57, high: 89, sentence: "This score reflects your willingness to communicate in small group discussions." },
+      { key: "meetings", name: "Meetings", items: [6, 11, 17], low: 39, high: 80, sentence: "This score reflects your willingness to communicate in larger meeting settings." },
+      { key: "interpersonal", name: "Interpersonal Conversations", items: [4, 9, 12], low: 64, high: 94, sentence: "This score reflects your willingness to communicate in one-on-one informal conversations." },
+      { key: "public", name: "Public Speaking", items: [3, 14, 20], low: 33, high: 78, sentence: "This score reflects your willingness to communicate when speaking before a group." },
+      { key: "stranger", name: "Stranger", items: [3, 8, 12, 17], low: 18, high: 63, sentence: "This score reflects your willingness to communicate with strangers." },
+      { key: "acquaintance", name: "Acquaintance", items: [4, 11, 15, 20], low: 57, high: 92, sentence: "This score reflects your willingness to communicate with acquaintances." },
+      { key: "friend", name: "Friend", items: [6, 9, 14, 19], low: 71, high: 99, sentence: "This score reflects your willingness to communicate with friends." }
+    ];
+
+    const totalScale = {
+      key: "total",
+      name: "Total WTC",
+      low: 52,
+      high: 82,
+      sentence: "This score reflects your overall willingness to communicate across audience types."
+    };
+
+    const answers = Array(20).fill(null);
+    const completed = new Set();
+    const itemsContainer = document.getElementById("items");
+
+    function buildItems() {
+      items.forEach((text, index) => {
+        const number = index + 1;
+        const row = document.createElement("div");
+        row.className = "item unanswered";
+        row.id = `itemRow${number}`;
+
+        row.innerHTML = `
+          <label class="item-label" for="q${number}"><span>${number}.</span>${text}</label>
+          <input type="range" id="q${number}" min="0" max="100" step="1" value="50" aria-label="Item ${number}: ${text}">
+          <div class="valueBox">
+            <input class="percentValue" id="q${number}Value" type="number" min="0" max="100" step="1" placeholder="--" aria-label="Percentage for item ${number}">
+            <span>%</span>
+          </div>
+        `;
+
+        itemsContainer.appendChild(row);
+
+        const slider = document.getElementById(`q${number}`);
+        const numberInput = document.getElementById(`q${number}Value`);
+
+        function setAnswer(rawValue) {
+          let value = Number(rawValue);
+          if (Number.isNaN(value)) return;
+          value = Math.max(0, Math.min(100, Math.round(value)));
+          answers[index] = value;
+          completed.add(index);
+          slider.value = value;
+          numberInput.value = value;
+          row.classList.remove("unanswered");
+          updateProgress();
+        }
+
+        slider.addEventListener("input", e => setAnswer(e.target.value));
+        numberInput.addEventListener("input", e => {
+          if (e.target.value === "") {
+            answers[index] = null;
+            completed.delete(index);
+            row.classList.add("unanswered");
+            updateProgress();
+          } else {
+            setAnswer(e.target.value);
+          }
+        });
+      });
+    }
+
+    function updateProgress() {
+      const count = completed.size;
+      const pct = Math.round((count / 20) * 100);
+      document.getElementById("progressText").textContent = `${count} out of 20 completed`;
+      document.getElementById("progressPercent").textContent = `${pct}%`;
+      document.getElementById("progressFill").style.width = `${pct}%`;
+      document.getElementById("errorMsg").style.display = "none";
+    }
+
+    function average(itemNumbers) {
+      const sum = itemNumbers.reduce((acc, itemNumber) => acc + answers[itemNumber - 1], 0);
+      return sum / itemNumbers.length;
+    }
+
+    function classify(score, lowThreshold, highThreshold) {
+      if (score < lowThreshold) return "Low";
+      if (score > highThreshold) return "High";
+      return "Average";
+    }
+
+    function badge(label) {
+      return `<span class="badge ${label.toLowerCase()}">${label}</span>`;
+    }
+
+    function formatScore(score) {
+      return Number.isInteger(score) ? String(score) : score.toFixed(1);
+    }
+
+    function comparisonBar(score, low, high) {
+      const safeScore = Math.max(0, Math.min(100, score));
+      return `
+        <div class="barGroup">
+          <div class="scaleBar" style="--lowStop:${low}%; --highStop:${high}%; --score:${safeScore};" aria-label="Score ${formatScore(score)} on a 0 to 100 norm bar">
+            <div class="marker"></div>
+          </div>
+          <div class="barLabels">
+            <span>0</span>
+            <span>Low &lt; ${low}</span>
+            <span>High &gt; ${high}</span>
+            <span>100</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function resultSentence(scaleName, label, explainer) {
+      return `${scaleName}: ${label} WTC. ${explainer}`;
+    }
+
+    function calculateResults(event) {
+      event.preventDefault();
+      if (completed.size < 20) {
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      const subscores = scoring.map(scale => {
+        const score = average(scale.items);
+        const label = classify(score, scale.low, scale.high);
+        return { ...scale, score, label };
+      });
+
+      const stranger = subscores.find(s => s.key === "stranger").score;
+      const acquaintance = subscores.find(s => s.key === "acquaintance").score;
+      const friend = subscores.find(s => s.key === "friend").score;
+      const total = (stranger + acquaintance + friend) / 3;
+      const totalLabel = classify(total, totalScale.low, totalScale.high);
+
+      document.getElementById("overallScore").textContent = formatScore(total);
+      document.getElementById("overallBadge").innerHTML = badge(totalLabel);
+      document.getElementById("overallInterpretation").textContent = resultSentence("Total WTC", totalLabel, totalScale.sentence);
+
+      const rows = document.getElementById("scoreRows");
+      rows.innerHTML = "";
+
+      const allRows = [
+        { ...totalScale, score: total, label: totalLabel },
+        ...subscores
+      ];
+
+      allRows.forEach(scale => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="Scale"><strong>${scale.name}</strong></td>
+          <td data-label="Score" class="scoreCell">${formatScore(scale.score)} ${badge(scale.label)}</td>
+          <td data-label="Interpretation" class="interpretation">${resultSentence(scale.name, scale.label, scale.sentence)}</td>
+          <td data-label="Norm Comparison">${comparisonBar(scale.score, scale.low, scale.high)}</td>
+        `;
+        rows.appendChild(tr);
+      });
+
+      document.getElementById("results").style.display = "block";
+      document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function resetForm() {
+      answers.fill(null);
+      completed.clear();
+      document.querySelectorAll("input[type='range']").forEach(slider => slider.value = 50);
+      document.querySelectorAll(".percentValue").forEach(input => input.value = "");
+      document.querySelectorAll(".item").forEach(row => row.classList.add("unanswered"));
+      document.getElementById("results").style.display = "none";
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    buildItems();
+    updateProgress();
+    document.getElementById("wtcForm").addEventListener("submit", calculateResults);
+    document.getElementById("resetBtn").addEventListener("click", resetForm);
+  </script>
+</body>
+</html>
